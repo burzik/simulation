@@ -15,6 +15,7 @@ double normalDist();
 double exponentialDist(double lambda);
 double randomize();
 void show();
+unsigned int LecureRand();
 
 double counter = 0;
 double queCount = 0;
@@ -30,16 +31,10 @@ double minVal;
 double downTime = 0;
 double t1 = 0, t2;
 int *queArr = new int[255];
-/*
-int main() {
-	for (int i = 0; i < 10000; i++)
-		cout << normalDist() << '\n';
-		for (int i = 0; i < 10000; i++)
-		cout << exponentialDist(2) << '\n';
-	_getch();
 
-	return 0;
-}*/
+unsigned int pRnd_1 = 0;
+unsigned int pRnd_2 = 0;
+unsigned int LECURE_RAND_MAX = pow(2, 31) - 1;
 
 int main()
 {
@@ -124,15 +119,13 @@ int main()
 				}
 			}
 		}
-		//qwe
 		if (server)
 			downTime = downTime + timeTact - t1;
 	}
 	show();
 	double avgQue = queSum / counter;
-	cout << "\nINFO\n"<< "Count: "<< counter << "\nqueCount: " << queCount << "\nqueElemSum: " << queSum<< "\navgQue: " << avgQue << "\ndownTime: "<< downTime << endl;
-	//_getch();
-	//cin >> counter;
+	cout << "\nINFO\n"<< "Count: "<< counter << "\nqueCount: " << queCount << "\nqueElemSum: " << queSum<< "\navgQue: " << avgQue << "\ndownTime: "<< 500 - downTime << endl;
+	_getch();
 	return 0;
 }
 
@@ -156,18 +149,15 @@ double normalDist()
 {
 	double mean = 12.0;
 	double sigma = 2.0;
-	double x, y, h;
-	do 
-	{
-		x = -5.0 + 10.0 * randomize();
-		y = (1.0 / sqrt(2.0 * M_PI)) * exp((-1.0 * pow(x, 2.0)) / 2.0);
-		h = 0.4 * randomize();
-	} while (h > y);
-	return mean + sigma * x;
+	const double a = (8 * (M_PI - 3)) / (3 * M_PI * (4 - M_PI));
+	double x = 2 * randomize() - 1;
+	double sign = -std::signbit(x) * 2 + 1;
+	double errF_i = sign * sqrt(sqrt(pow(2 / (M_PI * a) + log(1 - x * x) / 2, 2) - log(1 - x * x) / a) -
+		(2 / (M_PI * a) + log(1 - x * x) / 2));
+	return mean + sigma * (sqrt(2) * errF_i);
 }
 double exponentialDist(double lambda)
 {
-	//NO 0-1 
 	double num = (-1.0 / lambda)*log(1.0 - randomize());
 	return num;
 }
@@ -187,4 +177,17 @@ void show()
 	for (int i = 0; i < que; i++)
 		cout << queArr[i] << " ";
 	cout << endl;
+}
+
+
+unsigned int PseudoRand1() {
+	return pRnd_1 = (1103515245 * pRnd_1 + 12345) % LECURE_RAND_MAX;
+}
+
+unsigned int PseudoRand2() {
+	return pRnd_2 = (16807 * pRnd_2 + 0) % LECURE_RAND_MAX;
+}
+
+unsigned int LecureRand() {
+	return (PseudoRand1() - PseudoRand2()) % LECURE_RAND_MAX;
 }
